@@ -24,13 +24,13 @@ const useMenuItem = () => [
   {
     _id: "1",
     title: "Contact",
-    route: "/admin",
+    route: "/",
     icon: <GridView className="text-xl" />,
   },
   {
     _id: "2",
     title: "Chart and Map",
-    route: "/admin/chart-and-map",
+    route: "/admin/dashboard",
     icon: <PeopleAlt className="text-xl" />,
   },
   {
