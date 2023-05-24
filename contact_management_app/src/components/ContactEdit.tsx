@@ -22,12 +22,10 @@ const ContactEdit = ({
   activeData,
 }: Props) => {
   const router = useRouter();
-  const PropertyID = router.query.management;
-  const [isImage, setIsImage] = useState<any>();
   const [isLoading, setIsLoading] = useState(false);
-  const [confirmPasswordFieldType, setConfirmPasswordFieldType] =
-    useState("password");
-  const [passwordFieldType, setPasswordFieldType] = useState("password");
+  const [isActive, setIsActive] = useState(false);
+  const [isSwitch, setIsSwitch] = useState(false);
+
   const tenantID = isActiveId;
   const ContactSchema = [
     {
@@ -56,19 +54,6 @@ const ContactEdit = ({
         .matches(/^[A-Za-z\s]+$/, "Last Name must be only alphabets"),
       className: "col-span-12 md:col-span-6",
     },
-    {
-      key: 3,
-      name: "status",
-      placeHolder: "Enter Your Status",
-      label: "Status",
-      initialValue: "",
-      type: "checkbox",
-      validationSchema: Yup.string()
-        .required("Status is required")
-        .min(3, "Status must be at least 3 characters long.")
-        .matches(/^[A-Za-z\s]+$/, "Status must be only alphabets"),
-      className: "col-span-12 md:col-span-6",
-    },
   ];
 
   const initialValues = ContactSchema?.reduce((accumulator, currentValue) => {
@@ -84,6 +69,12 @@ const ContactEdit = ({
     {} as any
   );
 
+  const handleCheckboxChangeSwitch = () => {
+    setIsSwitch(!isSwitch);
+  };
+  const handleCheckboxChange = () => {
+    setIsActive(!isActive);
+  };
   const handleSend = async (values: any) => {
     setIsLoading(true);
     try {
@@ -170,6 +161,33 @@ const ContactEdit = ({
                     )}
                   </Field>
                 ))}
+                <div className="w-full flex items-center gap-4">
+                  <div className="font-semibold">Status</div>
+                  <div className="flex items-center gap-6">
+                    <div className=" flex">
+                      <input
+                        type="checkbox"
+                        id="statusCheckbox"
+                        name="status"
+                        checked={isActive}
+                        onChange={handleCheckboxChange}
+                        className="mr-2"
+                      />
+                      <label htmlFor="statusCheckbox">Active</label>
+                    </div>
+                    <div className=" flex">
+                      <input
+                        type="checkbox"
+                        id="statusCheckbox"
+                        name="status"
+                        checked={isSwitch}
+                        onChange={handleCheckboxChangeSwitch}
+                        className="mr-2"
+                      />
+                      <label htmlFor="statusCheckbox">Inactive</label>
+                    </div>
+                  </div>
+                </div>
 
                 <div className="flex items-center col-span-12  justify-center flex-col gap-2 pt-4">
                   <button

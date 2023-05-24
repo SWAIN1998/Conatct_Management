@@ -6,6 +6,7 @@ import Swal from "sweetalert2";
 import useMenuItem from "@/hooks/useMenuItems";
 import { ExpandLess, ExpandMore, Logout } from "@mui/icons-material";
 import showError from "../../../utils/error";
+import { TaiyoLogo } from "@/assets/admin";
 
 const Drawer = () => {
   const [selectedSubMenu, setSelectedSubMenu] = useState("");
@@ -39,9 +40,9 @@ const Drawer = () => {
     >
       <div className="grid place-items-center h-24">
         <img
-          src=""
+          src={TaiyoLogo.src}
           alt="marketplace"
-          className="w-11/12 cursor-pointer"
+          className="w-4/5 h-[3.5rem] cursor-pointer"
           onClick={() => router.push("/")}
         />
       </div>

@@ -87,6 +87,10 @@ const Home = () => {
 
   const handleAddContact = () => {
     setIsRegisterOpen(true);
+    setOpenTenant(true);
+    const newData = [...data];
+    newData.push(activeData.id);
+    setData(newData);
   };
 
   const handleCheckboxChange = (event: any) => {
