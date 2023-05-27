@@ -102,7 +102,7 @@ const Home = () => {
 
   return (
     <PublicLayout title="Contact Management">
-      <div className=" flex flex-col p-4">
+      <div className="w-full flex flex-col p-4">
         <ContactEdit
           open={openTenant}
           onClose={() => setOpenTenant(false)}
@@ -150,7 +150,7 @@ const Home = () => {
                 title: "Status",
                 tooltip: "Status",
                 field: "status",
-                width: "20%",
+                width: "30%",
                 render: (rowData: any) => (
                   <IOSSwitch
                     checked={rowData?.blockStatus === "Active" ? true : false}
