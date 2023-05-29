@@ -1,5 +1,5 @@
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { Dialog, IconButton, TextFieldProps } from "@mui/material";
+import { Dialog, IconButton, Switch, TextFieldProps } from "@mui/material";
 import { Field, Form, Formik } from "formik";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -33,7 +33,7 @@ const ContactEdit = ({
       name: "firstName",
       label: "First Name",
       placeHolder: "Enter Your FirstName",
-      initialValue: "",
+      initialValue: activeData?.firstName,
       type: "text",
       validationSchema: Yup.string()
         .required("First Name is required.")
@@ -46,7 +46,7 @@ const ContactEdit = ({
       name: "lastName",
       placeHolder: "Enter Your LastName",
       label: "Last Name",
-      initialValue: "",
+      initialValue: activeData?.lastName,
       type: "text",
       validationSchema: Yup.string()
         .required("Last Name is required")
@@ -163,30 +163,13 @@ const ContactEdit = ({
                 ))}
                 <div className="w-full flex items-center gap-4">
                   <div className="font-semibold">Status</div>
-                  <div className="flex items-center gap-6">
-                    <div className=" flex">
-                      <input
-                        type="checkbox"
-                        id="statusCheckbox"
-                        name="status"
-                        checked={isActive}
-                        onChange={handleCheckboxChange}
-                        className="mr-2"
-                      />
-                      <label htmlFor="statusCheckbox">Active</label>
-                    </div>
-                    <div className=" flex">
-                      <input
-                        type="checkbox"
-                        id="statusCheckbox"
-                        name="status"
-                        checked={isSwitch}
-                        onChange={handleCheckboxChangeSwitch}
-                        className="mr-2"
-                      />
-                      <label htmlFor="statusCheckbox">Inactive</label>
-                    </div>
-                  </div>
+                  <Switch
+                    checked={isSwitch}
+                    onChange={handleCheckboxChangeSwitch}
+                    color="primary"
+                    name="checkedB"
+                    inputProps={{ "aria-label": "primary checkbox" }}
+                  />
                 </div>
 
                 <div className="flex items-center col-span-12  justify-center flex-col gap-2 pt-4">

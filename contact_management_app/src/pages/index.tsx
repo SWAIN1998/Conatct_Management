@@ -1,5 +1,5 @@
 import { Delete, Edit } from "@mui/icons-material";
-import { Avatar, TextFieldProps, Tooltip } from "@mui/material";
+import { Avatar, Switch, TextFieldProps, Tooltip } from "@mui/material";
 import React from "react";
 import MaterialTable from "@material-table/core";
 import IOSSwitch from "@/components/core/IOSSwitch";
@@ -10,6 +10,10 @@ import * as Yup from "yup";
 import { MuiTblOptions } from "../../utils";
 import { PublicLayout } from "@/layouts";
 import ContactEdit from "@/components/ContactEdit";
+import { addContact, editContact, removeContact } from "../Redux/action";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useRouter } from "next/router";
 
 const ContactSchema = [
   {
@@ -51,18 +55,19 @@ const validationSchema = ContactSchema?.reduce((accumulator, currentValue) => {
 }, {} as any);
 
 const Home = () => {
-  const [isActive, setIsActive] = React.useState(false);
   const [activeData, setActiveData] = React.useState<any>(null);
   const [open, setOpen] = React.useState(false);
   const [isEdit, setIsEdit] = React.useState(false);
-  const [data, setData] = React.useState<any>([]);
-  const [columns, setColumns] = React.useState<any>([]);
-  const [isLoading, setIsLoading] = React.useState(false);
   const [isSwitch, setIsSwitch] = React.useState(false);
   const [isDelete, setIsDelete] = React.useState(false);
   const [isActiveId, setIsActiveId] = React.useState<any>(null);
   const [openTenant, setOpenTenant] = React.useState(false);
   const [isRegisterOpen, setIsRegisterOpen] = React.useState(false);
+  const [form, setForm] = React.useState<any>({});
+  console.log("form", form);
+  const router = useRouter();
+  const AllContacts = useSelector((store: any) => store.contacts);
+  const dispatch = useDispatch();
 
   const handleActiveData = (data: any) => {
     setActiveData(data);
@@ -74,32 +79,34 @@ const Home = () => {
   const handleBlock = (data: any) => {
     setIsSwitch(true);
     setActiveData(data);
+    setIsActiveId(data.id);
   };
 
-  const handleDelete = (data: any) => {
-    setIsDelete(true);
-    setActiveData(data);
-  };
-
-  const handleOpenTenantModal = (data: any) => {
-    setOpen(true);
-  };
-
-  const handleAddContact = () => {
-    setIsRegisterOpen(true);
+  const handleEdit = (data: any) => {
+    setIsActiveId(data.id);
     setOpenTenant(true);
-    const newData = [...data];
-    newData.push(activeData.id);
-    setData(newData);
+  };
+  const handleCheckboxChangeSwitch = () => {
+    setIsSwitch(!isSwitch);
   };
 
-  const handleCheckboxChange = (event: any) => {
-    setIsActive(event.target.checked);
-  };
-  const handleCheckboxChangeSwitch = (event: any) => {
-    setIsSwitch(event.target.checked);
+  const handleChange = (e: any) => {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    });
   };
 
+  function handleSave() {
+    dispatch(
+      addContact({
+        ...form,
+        status: isSwitch ? "Active" : "Inactive",
+      })
+    );
+  }
+
+  useEffect(() => {}, [dispatch, AllContacts.length]);
   return (
     <PublicLayout title="Contact Management">
       <div className="w-full flex flex-col p-4">
@@ -111,7 +118,12 @@ const Home = () => {
         />
         <div className="w-full flex flex-col  justify-center items-center  ">
           <MaterialTable
-            data={data}
+            data={AllContacts.map((el: any) => {
+              return {
+                ...el,
+                sl: AllContacts.indexOf(el) + 1,
+              };
+            })}
             title={
               <div className="flex gap-3 justify-center items-center">
                 <div className="text-lg font-bold text-themeDarkGray">
@@ -153,9 +165,14 @@ const Home = () => {
                 width: "30%",
                 render: (rowData: any) => (
                   <IOSSwitch
-                    checked={rowData?.blockStatus === "Active" ? true : false}
+                    checked={rowData?.status === "Active"}
                     onChange={() => {
-                      handleBlock(rowData);
+                      const data = {
+                        ...rowData,
+                        status:
+                          rowData?.status === "Active" ? "Inactive" : "Active",
+                      };
+                      dispatch(editContact(data));
                     }}
                   />
                 ),
@@ -172,7 +189,7 @@ const Home = () => {
                     <div className="flex flex-row items-center gap-1 ">
                       <Tooltip title="Delete">
                         <Avatar
-                          onClick={() => handleDelete(row as any)}
+                          onClick={() => dispatch(removeContact(row?.id))}
                           variant="rounded"
                           className="!mr-1 !cursor-pointer !bg-theme !p-0"
                         >
@@ -181,7 +198,7 @@ const Home = () => {
                       </Tooltip>
                       <Tooltip title="Edit">
                         <Avatar
-                          onClick={() => handleOpenTenantModal(row as any)}
+                          onClick={() => handleEdit(row as any)}
                           variant="rounded"
                           className="!mr-1 !cursor-pointer !bg-themeGray !p-0"
                         >
@@ -204,23 +221,23 @@ const Home = () => {
             <Formik
               initialValues={initialValues}
               validationSchema={Yup.object(validationSchema)}
-              onSubmit={handleAddContact}
+              onSubmit={handleSave}
             >
               {(formik) => (
                 <Form className="w-full grid grid-cols-12 gap-4">
                   {ContactSchema?.map((inputItem) => (
-                    <Field name={inputItem?.name} key={inputItem?.key}>
+                    <Field name={inputItem?.name} key={inputItem.key}>
                       {(props: {
                         meta: { touched: any; error: any };
                         field: JSX.IntrinsicAttributes & TextFieldProps;
                       }) => (
                         <div
-                          className={`flex flex-col justify-center gap-3 ${inputItem?.className}`}
+                          className={`flex w-full justify-center gap-4 ${inputItem.className}`}
                         >
-                          <div className="font-semibold">
-                            {inputItem?.label}
-                          </div>
-                          <div className="col-span-6 w-full">
+                          <div className="flex flex-col w-full justify-center gap-2">
+                            <div className="font-semibold text-lg">
+                              {inputItem.label}
+                            </div>
                             <InputField
                               title={inputItem?.label}
                               key={inputItem?.key}
@@ -247,30 +264,13 @@ const Home = () => {
                   ))}
                   <div className="w-full flex items-center gap-4">
                     <div className="font-semibold">Status</div>
-                    <div className="flex items-center gap-6">
-                      <div className=" flex">
-                        <input
-                          type="checkbox"
-                          id="statusCheckbox"
-                          name="status"
-                          checked={isActive}
-                          onChange={handleCheckboxChange}
-                          className="mr-2"
-                        />
-                        <label htmlFor="statusCheckbox">Active</label>
-                      </div>
-                      <div className=" flex">
-                        <input
-                          type="checkbox"
-                          id="statusCheckbox"
-                          name="status"
-                          checked={isSwitch}
-                          onChange={handleCheckboxChangeSwitch}
-                          className="mr-2"
-                        />
-                        <label htmlFor="statusCheckbox">Inactive</label>
-                      </div>
-                    </div>
+                    <Switch
+                      checked={isSwitch}
+                      onChange={handleCheckboxChangeSwitch}
+                      color="primary"
+                      name="checkedB"
+                      inputProps={{ "aria-label": "primary checkbox" }}
+                    />
                   </div>
 
                   <div className="flex items-center col-span-12  justify-center flex-col gap-2 pt-4">
@@ -279,7 +279,7 @@ const Home = () => {
                       className="btn-one"
                       disabled={formik.isSubmitting}
                     >
-                      {formik.isSubmitting ? "Please wait..." : "Add Contact"}
+                      Add Contact
                     </button>
                   </div>
                 </Form>

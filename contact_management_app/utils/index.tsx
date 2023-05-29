@@ -31,6 +31,24 @@ export const MuiTblOptions = () => {
   return options;
 };
 
+export const getLocalStorageItem = (key: any) => {
+  return typeof window !== "undefined"
+    ? localStorage.getItem(key) ?? null
+    : null;
+};
+
+export const saveToLocalStorage = (key: any, value: any) => {
+  if (typeof window !== "undefined") {
+    localStorage.setItem(key, value);
+  }
+};
+
+export const removeFromLocalStorage = (key: any) => {
+  if (typeof window !== "undefined") {
+    localStorage.removeItem(key);
+  }
+};
+
 export const notify = {
   success: (message: string) =>
     toast.success(message, {
